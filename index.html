@@ -37,43 +37,63 @@
           <th>Meaning</th>
         </tr>
 
-        <tbody id="word-body">
-
-        </tbody>
+        <tbody id="word-body"></tbody>
       </table>
-
-      <p id="message"></p>
     </div>
 
-    <script>
-      const getWords = async () => {
-        // const kroos = document.getElementById("kroos");
-        // const english = document.getElementById("english");
-        // const meaning = document.getElementById("meaning");
-        const wordBody = document.getElementById("word-body")
-        const message = document.getElementById("message");
+    <form id="suggestion-form">
+      <label for="suggestion">Suggest a word</label>
+      <input type="text" placeholder="Suggestion" id="suggestion" />
+      <button type="submit">Suggest</button>
+    </form>
+    <p id="message"></p>
+    <p id="suggestion-message"></p>
 
+    <script>
+      const suggestForm = document.getElementById("suggestion-form");
+
+      const getWords = async () => {
+        const wordBody = document.getElementById("word-body");
+        const message = document.getElementById("message");
         try {
-          const res = await axios.get("https://kroos.onrender.com/word/all-words");
+          const res = await axios.get(
+            "https://kroos.onrender.com/word/all-words",
+          );
           console.log(res.data);
 
           // manipulate
-         res.data.data.forEach((word) => {
+          res.data.data.forEach((word) => {
             wordBody.innerHTML += `
             <tr>
                 <td>${word.kroos}</td>
                 <td>${word.english}</td>
                 <td>${word.meaning}</td>
             </tr>
-            `
-         });
+            `;
+          });
         } catch (error) {
           console.error;
           message.textContent = error.message;
         }
       };
 
-      getWords()
+      suggestForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const message = document.getElementById("suggestion-message");
+        try {
+          let suggestion = document.getElementById("suggestion").value;
+          const res = await axios.post(
+            "https://kroos.onrender.com/word/suggest-word",
+            { suggestion },
+          );
+          message.textContent = `${suggestion} has been suggested successfully!`;
+        } catch (error) {
+          console.error(error.response?.data);
+          console.error(error);
+        }
+      });
+
+      getWords();
     </script>
   </body>
 </html>

@@ -30,32 +30,71 @@
       <button type="submit">Submit word</button>
     </form>
     <div id="message"></div>
+
+    <button id="showSuggestionsBtn">Show suggestions</button>
+    <div id="suggestionBox" style="display: none">
+      <p id="suggestCount"></p>
+    </div>
     <script>
       const form = document.getElementById("form");
       let kroos = document.getElementById("kroos");
       let english = document.getElementById("english");
       let meaning = document.getElementById("meaning");
-      let message = document.getElementById("message")
+      let message = document.getElementById("message");
+      const suggestionBox = document.getElementById("suggestionBox");
+      const suggestCount = document.getElementById("suggestCount");
+      const showSuggestionsBtn = document.getElementById("showSuggestionsBtn");
 
       const url = "https://kroos.onrender.com/word/add-word";
 
       form.addEventListener("submit", async (e) => {
-        e.preventDefault()
-          const wordData = {
-            kroos: kroos.value,
-            english: english.value,
-            meaning: meaning.value,
-          };
+        e.preventDefault();
+        const wordData = {
+          kroos: kroos.value,
+          english: english.value,
+          meaning: meaning.value,
+        };
         try {
+          const res = await axios.post(url, wordData);
+          console.log(`${wordData.kroosVal} created.`);
+          message.textContent = `${wordData.kroos} created successfully!`;
 
-          const res = await axios.post(url, wordData)
-          console.log(`${wordData.kroosVal} created.`)
-          message.textContent = `${wordData.kroos} created successfully!`
+          wordData = {
+            kroos: "",
+            english: "",
+            meaning: "",
+          };
         } catch (error) {
-            console.error('Error creating user:', error);
-            message.textContent = `Failed to create ${wordData.kroos}`
+          console.error("Error creating user:", error);
+          message.textContent = `Failed to create ${wordData.kroos}`;
         }
       });
+
+      const getAllSuggestions = async () => {
+        const res = await axios.get(
+          "https://kroos.onrender.com/word/all-suggested-words",
+        );
+
+        suggestCount.textContent = `You have ${res.data.data.length} suggestions`;
+
+        res.data.data.forEach((suggest) => {
+          suggestionBox.innerHTML += `
+          <ul>
+          <li>${suggest.suggestion}</li>
+          </ul>`;
+        });
+      };
+
+      showSuggestionsBtn.addEventListener("click", () => {
+        if (suggestionBox.style.display === "none") {
+          suggestionBox.style.display = "block";
+          showSuggestionsBtn.textContent = "Hide suggestions";
+        } else {
+          suggestionBox.style.display = "none";
+          showSuggestionsBtn.textContent = "Show suggestions";
+        }
+      });
+      getAllSuggestions();
     </script>
   </body>
 </html>
