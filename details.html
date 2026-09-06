@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kroos - Word Details</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.20.0/dist/axios.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css"
+    />
+  </head>
+  <body>
+    <h1 id="welcome-h1"></h1>
+    <div id="details-con">
+      <p>Kroos: <span id="kroos"></span></p>
+      <p>English: <span id="english"></span></p>
+      <p>Meaning: <span id="meaning"></span></p>
+    </div>
+
+    <div>
+      <a href="./index.html"><i class="fa-regular fa-house"></i></a>
+    </div>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const wordId = params.get("id");
+
+      const getWordDetails = async (req, res) => {
+        const h1 = document.getElementById("welcome-h1");
+        try {
+          const res = await axios.get(
+            `http://localhost:4000/word/details/${wordId}`,
+          );
+
+          const wordData = res.data.data;
+          kroos.textContent = wordData.kroos;
+          english.textContent = wordData.english;
+          meaning.textContent = wordData.meaning;
+          h1.textContent = `Details for ${wordData.kroos}`;
+        } catch (error) {
+          console.error(error.response?.data);
+        }
+      };
+
+      getWordDetails();
+    </script>
+  </body>
+</html>

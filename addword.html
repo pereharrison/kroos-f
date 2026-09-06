@@ -50,9 +50,9 @@
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const wordData = {
-          kroos: kroos.value,
-          english: english.value,
-          meaning: meaning.value,
+          kroos: kroos.value.toLowerCase(),
+          english: english.value.toLowerCase(),
+          meaning: meaning.value.toLowerCase(),
         };
         try {
           const res = await axios.post(url, wordData);
@@ -80,7 +80,7 @@
         res.data.data.forEach((suggest) => {
           suggestionBox.innerHTML += `
           <ul>
-          <li>${suggest.suggestion}</li>
+          <li>English - ${suggest.englishSuggestion}, Kroos - ${suggest.kroosSuggestion}</li>
           </ul>`;
         });
       };

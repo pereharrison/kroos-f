@@ -20,6 +20,13 @@
       td {
         border: 1px solid black;
       }
+      a {
+        text-decoration: none;
+        color: black;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
     </style>
   </head>
   <body>
@@ -29,6 +36,13 @@
         ><i class="fa-solid fa-plus"></i
       ></a>
     </button>
+    <form id="search-form">
+      <label for="searchWord">Search for a word</label>
+      <input type="text" placeholder="e.g wait" id="searchWord" />
+      <button type="submit">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+    </form>
     <div>
       <table>
         <tr>
@@ -43,7 +57,12 @@
 
     <form id="suggestion-form">
       <label for="suggestion">Suggest a word</label>
-      <input type="text" placeholder="Suggestion" id="suggestion" />
+      <input
+        type="text"
+        placeholder="English suggestion"
+        id="english-suggestion"
+        />
+      <input type="text" placeholder="Kroos suggestion" id="kroos-suggestion" />
       <button type="submit">Suggest</button>
     </form>
     <p id="message"></p>
@@ -51,6 +70,7 @@
 
     <script>
       const suggestForm = document.getElementById("suggestion-form");
+      const searchForm = document.getElementById("search-form");
 
       const getWords = async () => {
         const wordBody = document.getElementById("word-body");
@@ -64,12 +84,12 @@
           // manipulate
           res.data.data.forEach((word) => {
             wordBody.innerHTML += `
-            <tr>
-                <td>${word.kroos}</td>
-                <td>${word.english}</td>
-                <td>${word.meaning}</td>
-            </tr>
-            `;
+                 <tr>
+                     <td><a href="./details.html?id=${word._id}">${word.kroos}</a></td>
+                     <td><a href="./details.html?id=${word._id}">${word.english}</a></td>
+                     <td><a href="./details.html?id=${word._id}">${word.meaning}</a></td>
+                 </tr>
+                 `;
           });
         } catch (error) {
           console.error;
@@ -81,15 +101,43 @@
         e.preventDefault();
         const message = document.getElementById("suggestion-message");
         try {
-          let suggestion = document.getElementById("suggestion").value;
+          const suggestionData = {
+            kroosSuggestion: document.getElementById("kroos-suggestion").value,
+            englishSuggestion: document.getElementById("english-suggestion").value,
+          };
+
           const res = await axios.post(
             "https://kroos.onrender.com/word/suggest-word",
-            { suggestion },
+             suggestionData ,
           );
-          message.textContent = `${suggestion} has been suggested successfully!`;
+          message.textContent = `${suggestionData.kroosSuggestion} has been suggested successfully!`;
         } catch (error) {
           console.error(error.response?.data);
           console.error(error);
+        }
+      });
+
+      searchForm.addEventListener("submit", async (e) => {
+        try {
+          e.preventDefault();
+
+          let searchValue = document.getElementById("searchWord").value.trim();
+          const wordBody = document.getElementById("word-body");
+
+          const res = await axios.get(
+            `http://localhost:4000/word/${searchValue}`,
+          );
+          const word = res.data.data;
+
+          wordBody.innerHTML = `
+               <tr>
+                 <td><a href="./details.html?id=${word._id}">${word.kroos}</a></td>
+                 <td><a href="./details.html?id=${word._id}">${word.english}</a></td>
+                 <td><a href="./details.html?id=${word._id}">${word.meaning}</a></td>
+               </tr>
+             `;
+        } catch (error) {
+          console.log(error);
         }
       });
 
