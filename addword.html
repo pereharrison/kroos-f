@@ -9,6 +9,25 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css"
     />
     <script src="https://cdn.jsdelivr.net/npm/axios@1.20.0/dist/axios.min.js"></script>
+    <style>
+      table {
+        border: 1px solid black;
+        width: fit-content;
+      }
+      th {
+        border: 1px solid black;
+      }
+      td {
+        border: 1px solid black;
+      }
+      a {
+        text-decoration: none;
+        color: black;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
   </head>
   <body>
     <button>
@@ -31,10 +50,21 @@
     </form>
     <div id="message"></div>
 
-    <button id="showSuggestionsBtn">Show suggestions</button>
-    <div id="suggestionBox" style="display: none">
+    <div>
       <p id="suggestCount"></p>
+      <button id="showSuggestionsBtn">Show suggestions</button>
     </div>
+
+    <table id="suggestionBox" style="display: none">
+        <tr>
+          <th>English</th>
+          <th>Kroos</th>
+          <th>Contact</th>
+          <th>Platform</th>
+        </tr>
+
+      <tbody id="suggestion-table"></tbody>
+    </table>
     <script>
       const form = document.getElementById("form");
       let kroos = document.getElementById("kroos");
@@ -44,8 +74,11 @@
       const suggestionBox = document.getElementById("suggestionBox");
       const suggestCount = document.getElementById("suggestCount");
       const showSuggestionsBtn = document.getElementById("showSuggestionsBtn");
+      const suggestionBody = document.getElementById("suggestion-table");
 
       const url = "https://kroos.onrender.com/word/add-word";
+
+      // add word
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -58,6 +91,7 @@
           const res = await axios.post(url, wordData);
           console.log(`${wordData.kroosVal} created.`);
           message.textContent = `${wordData.kroos} created successfully!`;
+          message.style.color = "green";
 
           wordData = {
             kroos: "",
@@ -67,6 +101,7 @@
         } catch (error) {
           console.error("Error creating user:", error);
           message.textContent = `Failed to create ${wordData.kroos}`;
+          message.style.color = "red";
         }
       });
 
@@ -78,10 +113,14 @@
         suggestCount.textContent = `You have ${res.data.data.length} suggestions`;
 
         res.data.data.forEach((suggest) => {
-          suggestionBox.innerHTML += `
-          <ul>
-          <li>English - ${suggest.englishSuggestion}, Kroos - ${suggest.kroosSuggestion}</li>
-          </ul>`;
+          suggestionBody.innerHTML += `
+          <tr>
+           <td>${suggest.englishSuggestion}</td> 
+           <td>${suggest.kroosSuggestion}</td> 
+           <td>${suggest.contactSuggestor}</td> 
+           <td>${suggest.contactPlatform}</td> 
+          </tr>
+          `;
         });
       };
 

@@ -31,11 +31,7 @@
   </head>
   <body>
     <div><span>Kroos</span> is the language of the future.</div>
-    <button>
-      <a href="./addword.html" title="Add new word"
-        ><i class="fa-solid fa-plus"></i
-      ></a>
-    </button>
+
     <form id="search-form">
       <label for="searchWord">Search for a word</label>
       <input type="text" placeholder="e.g wait" id="searchWord" />
@@ -43,6 +39,8 @@
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
     </form>
+
+    <!-- display words -->
     <div>
       <table>
         <tr>
@@ -55,23 +53,54 @@
       </table>
     </div>
 
+    <!-- Suggestion section -->
     <form id="suggestion-form">
-      <label for="suggestion">Suggest a word</label>
-      <input
-        type="text"
-        placeholder="English suggestion"
-        id="english-suggestion"
+      <div>
+        <label for="suggestion">Enter english word</label>
+        <input
+          type="text"
+          placeholder="English suggestion"
+          id="english-suggestion"
         />
-      <input type="text" placeholder="Kroos suggestion" id="kroos-suggestion" />
+      </div>
+      <div>
+        <label for="kroos-suggestion">Enter kroos word</label>
+        <input
+          type="text"
+          placeholder="Kroos suggestion"
+          id="kroos-suggestion"
+        />
+      </div>
+      <div>
+        <label for="contact-suggestor" title="A way for us to contact"
+          >Enter social media contact:</label
+        >
+        <input
+          type="text"
+          placeholder="e.g peresomebody"
+          id="contact-suggestor"
+        />
+      </div>
+      <div>
+        <label for="contact-platform">Select contact platform</label>
+        <select name="contact-platform" id="contact-platform">
+          <option value="tiktok">Tiktok</option>
+          <option value="instagram">Instagram</option>
+          <option value="twitter">X</option>
+        </select>
+      </div>
+
       <button type="submit">Suggest</button>
     </form>
     <p id="message"></p>
-    <p id="suggestion-message"></p>
+    <p id="suggestion-message" style="color: red"></p>
 
     <script>
       const suggestForm = document.getElementById("suggestion-form");
       const searchForm = document.getElementById("search-form");
+      const message = document.getElementById("message");
 
+      // all words
       const getWords = async () => {
         const wordBody = document.getElementById("word-body");
         const message = document.getElementById("message");
@@ -102,18 +131,28 @@
         const message = document.getElementById("suggestion-message");
         try {
           const suggestionData = {
-            kroosSuggestion: document.getElementById("kroos-suggestion").value,
-            englishSuggestion: document.getElementById("english-suggestion").value,
+            kroosSuggestion: document
+              .getElementById("kroos-suggestion")
+              .value.toLowerCase(),
+            englishSuggestion: document
+              .getElementById("english-suggestion")
+              .value.toLowerCase(),
+            contactSuggestor: document
+              .getElementById("contact-suggestor")
+              .value.toLowerCase(),
+            contactPlatform: document.getElementById("contact-platform").value,
           };
 
           const res = await axios.post(
-            "https://kroos.onrender.com/word/suggest-word",
-             suggestionData ,
+            "http://localhost:4000/word/suggest-word",
+            suggestionData,
           );
           message.textContent = `${suggestionData.kroosSuggestion} has been suggested successfully!`;
+          message.style.color = "green"
         } catch (error) {
           console.error(error.response?.data);
-          console.error(error);
+          message.textContent =
+            error.response?.data?.message || "Something went wrong.";
         }
       });
 
@@ -125,7 +164,7 @@
           const wordBody = document.getElementById("word-body");
 
           const res = await axios.get(
-            `http://localhost:4000/word/${searchValue}`,
+            `https://kroos.onrender.com/word/${searchValue}`,
           );
           const word = res.data.data;
 
@@ -138,6 +177,9 @@
              `;
         } catch (error) {
           console.log(error);
+          message.textContent =
+            error.response?.data?.message || "Something went wrong.";
+          message.style.color = "red";
         }
       });
 
